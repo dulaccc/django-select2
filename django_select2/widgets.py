@@ -406,6 +406,7 @@ class HeavySelect2Mixin(Select2Mixin):
         self.url = kwargs.pop('data_url', None)
         self.userGetValTextFuncName = kwargs.pop('userGetValTextFuncName', u'null')
         self.choices = kwargs.pop('choices', [])
+        self.filter_by = kwargs.pop('filter_by', None)
 
         if not self.view and not self.url:
             raise ValueError('data_view or data_url is required')
@@ -638,6 +639,8 @@ class AutoHeavySelect2Mixin(object):
                     var hashedSelector = "#" + selector;
                     $(hashedSelector).data("field_id", fieldID);
                   ''' % (fieldset_id)
+            if self.filter_by:
+                js += u'$(hashedSelector).data("filter_by", "%s");' % self.filter_by['id']
             js += super(AutoHeavySelect2Mixin, self).render_inner_js_code(id_, *args)
             js += '};'
             js += 'django_select2.%s("%s", "%s");' % (fieldset_id, id_, self.field_id)
