@@ -5,8 +5,6 @@ import re
 import threading
 import types
 
-from django.utils.encoding import force_unicode
-
 logger = logging.getLogger(__name__)
 
 
@@ -72,7 +70,7 @@ def is_valid_id(val):
         return True
 
 if ENABLE_MULTI_PROCESS_SUPPORT:
-    from memcache_wrapped_db_client import Client
+    from .memcache_wrapped_db_client import Client
     remote_server = Client(MEMCACHE_HOST, str(MEMCACHE_PORT), MEMCACHE_TTL)
 
 @synchronized
@@ -92,16 +90,16 @@ def register_field(key, field):
     """
     global __id_store, __field_store
 
-    from fields import AutoViewFieldMixin
+    from .fields import AutoViewFieldMixin
     if not isinstance(field, AutoViewFieldMixin):
         raise ValueError('Field must extend AutoViewFieldMixin')
 
     if key not in __field_store:
         # Generating id
         if GENERATE_RANDOM_ID:
-            id_ = u"%d:%s" % (len(__id_store), unicode(datetime.datetime.now()))
+            id_ = "%d:%s" % (len(__id_store), str(datetime.datetime.now()))
         else:
-            id_ = unicode(hashlib.sha1("%s:%s" % (key, SECRET_SALT)).hexdigest())
+            id_ = str(hashlib.sha1(bytes("%s:%s" % (key, SECRET_SALT), encoding='utf-8')).hexdigest())
 
         __field_store[key] = id_
         __id_store[id_] = field
@@ -166,7 +164,7 @@ def timer_end(t):
 def timer(f):
     def inner(*args, **kwargs):
 
-        t = timer_start(f.func_name)
+        t = timer_start(f.__name__)
         ret = f(*args, **kwargs)
         timer_end(t)
 

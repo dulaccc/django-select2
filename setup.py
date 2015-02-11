@@ -151,8 +151,8 @@ def minify(files, outfile, ftype):
         with open(getPkgPath() + outfile, 'w') as f:
             f.write(data['compiled_code'].encode('utf8'))
     else:
-        print data['error_code']
-        print data['error']
+        print(data['error_code'])
+        print(data['error'])
         raise Exception('Could not minify.')
 
 if len(sys.argv) > 1 and 'sdist' == sys.argv[1]:
@@ -167,7 +167,7 @@ setup(
     name=NAME,
     version=VERSION,
     description=DESCRIPTION,
-    long_description=read("README.md"),
+    long_description=read("README.md").decode('utf8'),
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
     license="LICENSE.txt",
