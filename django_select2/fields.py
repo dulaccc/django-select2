@@ -191,7 +191,7 @@ class ModelResultJsonMixin(object):
         """
         return {}
 
-    def prepare_qs_params(self, request, search_term, search_fields):
+    def prepare_qs_params(self, request, search_term, search_fields, filter_by):
         """
         Prepares queryset parameter to use for searching.
 
@@ -254,9 +254,16 @@ class ModelResultJsonMixin(object):
                 q = Q(**kwargs)
             else:
                 q = q | Q(**kwargs)
-        return {'or': [q], 'and': {}}
 
-    def get_results(self, request, term, page, context):
+        params = {'or': [q], 'and': {}}
+
+        if filter_by:
+            related_name = self.widget.filter_by['related_name']
+            params['and'][related_name] = filter_by
+
+        return params
+
+    def get_results(self, request, term, page, context, filter_by):
         """
         See :py:meth:`.views.Select2View.get_results`.
 
@@ -266,7 +273,7 @@ class ModelResultJsonMixin(object):
             raise ValueError('search_fields is required.')
 
         qs = copy.deepcopy(self.get_queryset())
-        params = self.prepare_qs_params(request, term, self.search_fields)
+        params = self.prepare_qs_params(request, term, self.search_fields, filter_by)
 
         if self.max_results:
             min_ = (page - 1) * self.max_results

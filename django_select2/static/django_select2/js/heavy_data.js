@@ -6,10 +6,13 @@ if (!window['django_select2']) {
 												// since this can't be entered by user.
 		get_url_params: function (term, page, context) {
 			var field_id = jQuery(this).data('field_id'),
+				filter_by_id = jQuery(this).data('filter_by'),
+				filter_by = jQuery('#' + filter_by_id).val(),
 				res = {
 					'term': term,
 					'page': page,
-					'context': context
+					'context': context,
+					'filter': filter_by
 				};
 			if (field_id) {
 				res['field_id'] = field_id;
